@@ -27,13 +27,10 @@ class my_mat{
     private:
         double *ary;
         int sizeX,sizeY;
-        int sizeU,sizeV;
     public:
-        my_mat(int sizeX, int sizeY,int sizeU,int sizeV){
+        my_mat(int sizeX, int sizeY){
             this->sizeX = sizeX;
             this->sizeY = sizeY;
-            this->sizeU = sizeU;
-            this->sizeV = sizeV;
             ary = new double[sizeX*sizeY];
         }
         void set(int i , int j, double k){
@@ -47,54 +44,77 @@ class my_mat{
         }
 };
 
-void run_testcase( ifstream& infile ){
-    int X, Y, U, V, N;
+class TestCase{
+    public:
+        int X, Y, U, V, N;
+        my_mat *filter_mat;
+        my_mat *main_mat;
+        my_mat *main_mat_next;
+
+        void setup_test_case(int x,int y,int u,int v,int n){
+            X = x;
+            Y = y;
+            U = u;
+            V = v;
+            N = n;
+            main_mat = new my_mat(X,Y);
+            main_mat_next = new my_mat(X,Y);
+            filter_mat = new my_mat(U,V);
+        }
+        
+};
+
+void print_mat(my_mat main_mat,int X,int Y){
+// #ifdef DEBUG
     int row_num,col_num;
-    double xt;
-    
-    infile>>X>> Y>> U>> V>> N;
-    my_mat main_mat = my_mat(X,Y);
-    my_mat filter_mat = my_mat(U,V);
-    
-    for(row_num=0;row_num<X;row_num++){
-        for( col_num=0; col_num<Y;col_num ++ ){
-            infile>>xt;
-            main_mat.set(row_num,col_num,xt);
-        }
-    }
-
-    for(row_num=0;row_num<U;row_num++){
-        for( col_num=0; col_num<V;col_num ++ ){
-            infile>>xt;
-            filter_mat.set(row_num,col_num,xt);
-        }
-    }
-
-#ifdef DEBUG
     for(row_num=0;row_num<X;row_num++){
         for( col_num=0; col_num<Y;col_num ++ ){
             cerr<<main_mat.get(row_num,col_num);
         }
         cerr<<"\n";
     }
-
-    for(row_num=0;row_num<U;row_num++){
-        for( col_num=0; col_num<V;col_num ++ ){
-            cerr<<filter_mat.get(row_num,col_num);
-        }
-        cerr<<"\n";
-    }
-#endif
+// #endif
     return;
 }
 
 
 int main(){
+    
     int T;
+    int X, Y, U, V, N;
+    int row_num,col_num;
+    double xt;
+    
     ifstream infile;
     infile.open("input.txt");
+    
+    // Get number of test cases
     infile>>T;
+    TestCase *testCasesArr = new TestCase[T];
     for(int testcase=0; testcase<T;testcase++){
-        run_testcase( infile );
+        // Input test case no testcase
+        // run_testcase( infile );
+        infile>>X >> Y>> U>> V>> N;
+        testCasesArr[testcase].setup_test_case(X,Y,U,V,N);
+
+        for(row_num=0;row_num<X;row_num++){
+            for( col_num=0; col_num<Y;col_num ++ ){
+                infile>>xt;
+                testCasesArr[testcase].main_mat->set(row_num,col_num,xt);
+            }
+        }
+
+        for(row_num=0;row_num<U;row_num++){
+            for( col_num=0; col_num<V;col_num ++ ){
+                infile>>xt;
+                testCasesArr[testcase].filter_mat->set(row_num,col_num,xt);
+            }
+        }
     }
+
+    // Now we start parallel computation of convolutions
+
+
+
+
 }
