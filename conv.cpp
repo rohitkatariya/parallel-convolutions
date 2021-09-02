@@ -8,7 +8,7 @@
 
 using namespace std;
 
-// #define DEBUG
+//#define DEBUG
 
 
 
@@ -60,8 +60,8 @@ class TestCase{
 };
 
 void computeConvolutions(TestCase obj_testcase){
-    // obj_testcase.printTestCase();
-    int numProcs = omp_get_num_procs();
+    //obj_testcase.printTestCase();
+    //int numProcs = omp_get_num_procs();
     for(int n=0;n<obj_testcase.N;n++) {
         int prob_size = obj_testcase.X*obj_testcase.Y;
         #pragma omp parallel for
@@ -101,12 +101,24 @@ void computeConvolutions(TestCase obj_testcase){
     }
 }
 
+void print_mat_file(my_mat main_mat,int X,int Y,ofstream &fout){
+
+    int row_num,col_num;
+    for(row_num=0;row_num<X;row_num++){
+        for( col_num=0; col_num<Y;col_num ++ ){
+            fout<<std::scientific<<std::setprecision(10)<<main_mat.get(row_num,col_num)<<" ";
+        }
+        fout<<"\n";
+    }
+    return;
+}
+
 void print_mat(my_mat main_mat,int X,int Y){
 
     int row_num,col_num;
     for(row_num=0;row_num<X;row_num++){
         for( col_num=0; col_num<Y;col_num ++ ){
-            cerr<<main_mat.get(row_num,col_num)<<" ";
+            cerr<<std::scientific<<std::setprecision(10)<<main_mat.get(row_num,col_num)<<" ";
         }
         cerr<<"\n";
     }
@@ -123,8 +135,7 @@ int main(){
     double xt;
     
     ifstream infile;
-    infile.open("input10.txt");
-    
+    infile.open("input1.txt");
     // Get number of test cases
     infile>>T;
     TestCase *testCasesArr = new TestCase[T];
@@ -156,13 +167,15 @@ int main(){
         }
     #endif
     
-
+    ofstream outfile;
+    outfile.open("output.txt", ios::out | ios::trunc );
     // testCasesArr[0].printTestCase();
     // Sequential Execution of test cases
     for(int t=0;t<T;t++){
         // cout<<"T"<<t<<"\n";
         computeConvolutions(testCasesArr[t]);
-        // print_mat(*(testCasesArr[0].main_mat_next), testCasesArr[0].X,testCasesArr[0].Y);
+        //print_mat(*(testCasesArr[0].main_mat_next), testCasesArr[0].X,testCasesArr[0].Y);
+        print_mat_file(*(testCasesArr[0].main_mat_next), testCasesArr[0].X,testCasesArr[0].Y,outfile);
     }
     // computeConvolutions(testCasesArr[0]);
     // print_mat(*(testCasesArr[0].main_mat_next), testCasesArr[0].X,testCasesArr[0].Y);
